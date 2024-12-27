@@ -22,7 +22,7 @@ Examles are provided in the [examples directory](./examples).
 
 * [Parsing json into a struct](./examples/parse_object.c)
 * [Decoding JSON](./examples/decode.c)
-* [Encode JSON](./examples/encode.c)
+* [Encoding JSON](./examples/encoder.c)
 
 For more inspiration checkout the tests in [tests](./tests).
 
