@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <style>
+        table { border-collapse: collapse; }
+        td, th { border: 1px solid grey; }
+        td {padding: 4px;}
+        </style>
+        <title>
+            JSON ENCODE TABLES
+        </title>
+    </head>
+    <body>
+    <script>
+        document.write("<h1>ASCII</h1><p><table><thead><tr><td>hex</td><td>json</td></tr></thead><tbody>");
+        for(let i = 0; i < 128; i++){
+            document.write("<tr>");
+            document.write("<td>");
+            document.write(String.fromCharCode(i));
+            document.write("</td>");
+            document.write("<td>");
+            document.write(JSON.stringify(String.fromCharCode(i)));
+            document.write("</td>");
+            document.write("</tr>");
+        }
+        document.write("<tbody></table></p>");
+
+        document.write("<h1>Other</h1><p><table><thead><tr><td>hex</td><td>json</td></tr></thead><tbody>");
+        const testChars = ["Ö", "ö", "^", "¬", "🎄", "🎅🏿", " 🏿"];
+        for(let i = 0; i < testChars.length; i++){
+            document.write("<tr>");
+            document.write("<td>");
+            document.write(testChars[i]);
+            document.write("</td>");
+            document.write("<td>");
+            document.write(JSON.stringify(testChars[i]));
+            document.write("</td>");
+            document.write("</tr>");
+        }
+        document.write("<tbody></table></p>");
+    </script>
+    </body>
+</html>

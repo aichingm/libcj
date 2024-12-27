@@ -9,34 +9,36 @@ struct person {
     double age;
 };
 
-enum cj_error_type pta_open(void* parent, unsigned int parent_tag, struct cj_key* key, void** open,
-                            unsigned int* type) {
+enum cj_error_code pta_open(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+                            void** open, unsigned int* tag) {
+    (void)type;
     switch (parent_tag) {
         case 0:
             struct person(*people)[100] = parent;
             *open = &(*people)[key->index];
-            *type = 1;
+            *tag = 1;
             break;
     }
-    return 0;
+    return cj_error_none;
 }
 
-void pta_set(void* this, unsigned int this_tag, struct cj_string* id, struct cj_value* value) {
+enum cj_error_code pta_set(void* this, unsigned int this_tag, struct cj_span* id, struct cj_value* value) {
     switch (this_tag) {
         case 1:
             struct person* p = (struct person*)this;
-            if (cj_streq(id, "lastName") && value->type == cj_type_string) {
-                cj_strcpy(&value->string, p->lastName, 20);
+            if (cj_span_eq(id, "lastName") && value->type == cj_type_string) {
+                cj_span_cpy(&value->string, p->lastName, 20);
             }
-            if (cj_streq(id, "firstName") && value->type == cj_type_string) {
-                cj_strcpy(&value->string, p->firstName, 20);
+            if (cj_span_eq(id, "firstName") && value->type == cj_type_string) {
+                cj_span_cpy(&value->string, p->firstName, 20);
             }
-            if (cj_streq(id, "age") && value->type == cj_type_number) {
+            if (cj_span_eq(id, "age") && value->type == cj_type_number) {
                 p->age = value->number;
             }
 
             break;
     }
+    return cj_error_none;
 }
 
 void test_cj_parse_to_array() {

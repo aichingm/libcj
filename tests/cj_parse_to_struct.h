@@ -20,58 +20,63 @@ struct project {
     struct metadata* metadata;
 };
 
-void pts_push(void* this, unsigned int tag, size_t index, struct cj_value* value) {
+enum cj_error_code pts_push(void* this, unsigned int tag, size_t index, struct cj_value* value) {
     switch (tag) {
         case 2:
             char(*tags)[100][20] = this;
             if (value->type == cj_type_string) {
-                cj_strcpy(&value->string, (*tags)[index], 20);
+                cj_span_cpy(&value->string, (*tags)[index], 20);
             }
             break;
     }
+    return cj_error_none;
 }
 
-enum cj_error_type pts_open(void* parent, unsigned int parent_tag, struct cj_key* key, void** open, unsigned int* tag) {
+enum cj_error_code pts_open(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+                            void** open, unsigned int* tag) {
+    (void)type;
     switch (parent_tag) {
         case 0:
             struct project* p = (struct project*)parent;
-            if (cj_streq(&key->id, "progress")) {
+            if (cj_span_eq(&key->id, "progress")) {
                 *open = &p->progress;
                 *tag = 1;
             }
-            if (cj_streq(&key->id, "tags")) {
+            if (cj_span_eq(&key->id, "tags")) {
                 *open = &p->tags;
                 *tag = 2;
             }
             break;
     }
+    return cj_error_none;
     return 0;
 }
 
-void pts_set(void* this, unsigned int tag, struct cj_string* id, struct cj_value* value) {
+enum cj_error_code pts_set(void* this, unsigned int tag, struct cj_span* id, struct cj_value* value) {
     switch (tag) {
         case 0:
             struct project* p = (struct project*)this;
-            if (cj_streq(id, "name") && value->type == cj_type_string) {
-                p->name = cj_strdup(&value->string);
+            if (cj_span_eq(id, "name") && value->type == cj_type_string) {
+                p->name = cj_span_dup(&value->string);
             }
-            if (cj_streq(id, "description") && value->type == cj_type_string) {
-                p->description = cj_strdup(&value->string);
+            if (cj_span_eq(id, "description") && value->type == cj_type_string) {
+                p->description = cj_span_dup(&value->string);
             }
-            if (cj_streq(id, "done") && value->type == cj_type_bool) {
+            if (cj_span_eq(id, "done") && value->type == cj_type_bool) {
                 p->done = value->boolean;
             }
-            if (cj_streq(id, "metadata") && value->type == cj_type_null) {
+            if (cj_span_eq(id, "metadata") && value->type == cj_type_null) {
                 p->metadata = NULL;
             }
             break;
         case 1:
             struct progress* progress = (struct progress*)this;
-            if (cj_streq(id, "linesWritten") && value->type == cj_type_number) {
+            if (cj_span_eq(id, "linesWritten") && value->type == cj_type_number) {
                 progress->linesWritten = value->number;
             }
             break;
     }
+    return cj_error_none;
 }
 
 void test_cj_parse_to_struct() {

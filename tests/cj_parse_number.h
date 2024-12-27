@@ -3,9 +3,9 @@
 
 #define CJ_TESTS_PARSE_NUMBER {"cj_parse_number", test_cj_parse_number}
 
-enum cj_error_type test_cj_parse_number_case(char* data, double* number) {
+enum cj_error_code test_cj_parse_number_case(char* data, double* number) {
     struct cj_value value;
-    enum cj_error_type err = cj_parse_number(&data, &value);
+    enum cj_error_code err = cj_parse_number(&data, &value);
     *number = value.number;
     return err;
 }

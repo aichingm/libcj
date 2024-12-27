@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "/home/mario/programming/libcj",
+    "command": "gcc -std=gnu23 -pedantic -g -Wall -Wextra -I. -c tests/all-tests.c  -o tests/all-tests.o",
+    "file": "tests/all-tests.c"
+  }
+]

@@ -4,6 +4,28 @@ Libcj is a simple header only json stringify and parsing library written in c, r
 
 [cj.h](./cj.h)
 
+## Usage
+
+Important notice
+
+The general usage is to include the implementation in you "main.c" file
+```c
+#define IMPL_CJ
+#include "cj.h"
+```
+and include only the header in other files like
+```
+#include "cj.h"
+```
+
+Examles are provided in the [examples directory](./examples).
+
+* [Parsing json into a struct](./examples/parse_object.c)
+* [Decoding JSON](./examples/decode.c)
+* [Encode JSON](./examples/encode.c)
+
+For more inspiration checkout the tests in [tests](./tests).
+
 ## License
 
 ```
