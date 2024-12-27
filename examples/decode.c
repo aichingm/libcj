@@ -1,3 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define IMPL_CJ
+#include "../cj.h"
+
 // Input data
 char* input_data =
     "{ \"name\": \"My \\\"Project\\\"\", \"description\": \"This is a project!\", \"progress\": { "

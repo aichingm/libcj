@@ -3,7 +3,7 @@
 // include implementations
 
 #define IMPL_CJ
-#include "../cj.h"
+#include "../cj.h" // IWYU pragma: keep for cj impl
 
 // include tests
 #include "tests/cj_de-en-code.h"

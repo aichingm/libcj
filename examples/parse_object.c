@@ -1,3 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define IMPL_CJ
+#include "../cj.h"
+
 // Input data
 char* input_data =
     "{\
@@ -10,9 +16,6 @@ char* input_data =
     \"metadata\": null,\
     \"done\": true\
 }";
-
-#define IMPL_CJ
-#include "../cj.h"
 
 // Prepare c-Structures
 #define TAG_PROGRESS 1

@@ -1,6 +1,5 @@
-char* input_data =
-    "{ \"name\": \"My \\\"Project\\\"\", \"description\": \"This is a project!\", \"progress\": { "
-    "\"linesWritten\": 628 }, \"tags\": [\"writing\", \"book\"], \"metadata\":null, \"done\":true }";
+#include <stdio.h>
+#include <stdlib.h>
 
 #define IMPL_CJ
 #include "../cj.h"

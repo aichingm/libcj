@@ -197,9 +197,8 @@ struct cj_error cj_parse_object_into(struct cj_parser* parser, char* b, void* ob
  */
 struct cj_error cj_parse_array_into(struct cj_parser* parser, char* b, void* array, unsigned int array_type);
 
-// TODO add doc
 /**
- *
+ * An enum of all posible parent types of entities (array, object, root).
  */
 enum cj_entity_parent_type {
     cj_entity_parent_object,
