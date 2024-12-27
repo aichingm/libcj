@@ -26,8 +26,8 @@ void test_cj_decode_object() {
     TEST_ASSERT(cj_entity_length(cj_entity_get_member(obj, "progress")) == 1);
     TEST_ASSERT(cj_entity_get_member(cj_entity_get_member(obj, "progress"), "linesWritten") != NULL);
     TEST_ASSERT(cj_entity_get_member(cj_entity_get_member(obj, "progress"), "linesWritten")->type == cj_type_number);
-    TEST_ASSERT(cj_entity_as_number(cj_entity_get_member(cj_entity_get_member(obj, "progress"), "linesWritten")) ==
-                628.);
+    TEST_ASSERT(cj_entity_as_number(cj_entity_get_member(cj_entity_get_member(obj, "progress"), "linesWritten")).integer ==
+                628);
     TEST_ASSERT(cj_entity_get_member(obj, "tags") != NULL);
     TEST_ASSERT(cj_entity_get_member(obj, "tags")->type == cj_type_array);
     TEST_ASSERT(cj_entity_length(cj_entity_get_member(obj, "tags")) == 2);
@@ -77,7 +77,7 @@ void test_cj_decode_array() {
 
     TEST_ASSERT(cj_entity_get_item(list, 2) != NULL);
     TEST_ASSERT(cj_entity_get_item(list, 2)->type == cj_type_number);
-    TEST_ASSERT(cj_entity_as_number(cj_entity_get_item(list, 2)) == 7.2f);
+    TEST_ASSERT(cj_entity_as_number(cj_entity_get_item(list, 2)).decimal == 7.2f);
 
     TEST_ASSERT(cj_entity_get_item(list, 3) != NULL);
     TEST_ASSERT(cj_entity_get_item(list, 3)->type == cj_type_string);
@@ -113,7 +113,7 @@ void test_cj_decode() {
     thing = cj_decode(json_number, NULL);
     TEST_ASSERT(thing != NULL);
     TEST_ASSERT(thing->type == cj_type_number);
-    TEST_ASSERT(cj_entity_as_number(thing) == 77.6f);
+    TEST_ASSERT(cj_entity_as_number(thing).decimal == 77.6f);
     cj_entity_free(thing);
 
     thing = cj_decode(json_null, NULL);
@@ -148,7 +148,7 @@ void test_cj_decode_extra_before_eof() {
     thing = cj_decode(json_number, NULL);
     TEST_ASSERT(thing != NULL);
     TEST_ASSERT(thing->type == cj_type_number);
-    TEST_ASSERT(cj_entity_as_number(thing) == 77.6f);
+    TEST_ASSERT(cj_entity_as_number(thing).decimal == 77.6f);
     cj_entity_free(thing);
 
     thing = cj_decode(json_null, NULL);

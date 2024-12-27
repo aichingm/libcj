@@ -7,13 +7,15 @@ char* input_data =
 
 struct state {
     char* name;
-    unsigned int population;
+    int population;
+    float hdi;
     bool contains_capital;
 };
 
 struct country {
     char* name;
-    unsigned int population;
+    int population;
+    float hdi;
     struct state states[20];
 };
 
@@ -24,8 +26,9 @@ int main(int argc, char* argv[]) {
     struct country austria = {
         .name = "Austria",
         .population = 9027999,
-        .states = {{.name = "Vienna", .population = 2014614, .contains_capital = true},
-                   {.name = "Lower Austria", .population = 1698796, .contains_capital = false},
+        .hdi = 0.926,
+        .states = {{.name = "Vienna", .population = 2014614, .hdi = 0.948, .contains_capital = true},
+                   {.name = "Lower Austria", .population = 1698796, .hdi = 0.893, .contains_capital = false},
                    {0}},
     };
 
@@ -38,7 +41,10 @@ int main(int argc, char* argv[]) {
     cj_encoder_push_string(&enc, austria.name);
 
     cj_encoder_push_id(&enc, "population");
-    cj_encoder_push_numeric(&enc, austria.population);
+    cj_encoder_push_integer(&enc, austria.population);
+
+    cj_encoder_push_id(&enc, "hdi");
+    cj_encoder_push_decimal(&enc, austria.hdi);
 
     cj_encoder_push_id(&enc, "states");
 
@@ -51,7 +57,10 @@ int main(int argc, char* argv[]) {
         cj_encoder_push_string(&enc, austria.states[i].name);
 
         cj_encoder_push_id(&enc, "population");
-        cj_encoder_push_numeric(&enc, austria.states[i].population);
+        cj_encoder_push_integer(&enc, austria.states[i].population);
+
+        cj_encoder_push_id(&enc, "hdi");
+        cj_encoder_push_decimal(&enc, austria.states[i].hdi);
 
         cj_encoder_push_id(&enc, "contains_capital");
         cj_encoder_push_bool(&enc, austria.states[i].contains_capital);

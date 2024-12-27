@@ -33,7 +33,7 @@ enum cj_error_code pta_set(void* this, unsigned int this_tag, struct cj_span* id
                 cj_span_cpy(&value->string, p->firstName, 20);
             }
             if (cj_span_eq(id, "age") && value->type == cj_type_number) {
-                p->age = value->number;
+                p->age = value->number.integer;
             }
 
             break;

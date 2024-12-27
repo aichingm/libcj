@@ -72,7 +72,7 @@ enum cj_error_code pts_set(void* this, unsigned int tag, struct cj_span* id, str
         case 1:
             struct progress* progress = (struct progress*)this;
             if (cj_span_eq(id, "linesWritten") && value->type == cj_type_number) {
-                progress->linesWritten = value->number;
+                progress->linesWritten = value->number.integer;
             }
             break;
     }

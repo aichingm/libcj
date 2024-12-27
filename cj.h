@@ -91,6 +91,35 @@ struct cj_span {
     size_t length;
 };
 
+/**
+ * A enum containing all possible numeric types.
+ */
+enum cj_numeric_type{
+    cj_numeric_type_integer,
+    cj_numeric_type_decimal,
+};
+
+/**
+ * A struct representing a numeric value, either an integer or a decimal. The type field is used to store this additional inforamtion.
+ */
+struct cj_numeric {
+    enum cj_numeric_type type;
+    union {
+        int integer;
+        float decimal;
+    };
+};
+
+/**
+ * Create a new cj_numeric of an integer value.
+ */
+struct cj_numeric cj_numeric_integer(int v);
+
+/**
+ * Create a new cj_numeric of an decimal value.
+ */
+struct cj_numeric cj_numeric_decimal(float v);
+
 // TODO remoce outer struct. It is not needed.
 /**
  * A struct holding an uion of an index(size_t) or an id(cj_span). More context is need to know which it acually is.
@@ -119,8 +148,7 @@ enum cj_type {
  */
 struct cj_value {
     union {
-        // TODO set this to double... Check tests!
-        float number;
+        struct cj_numeric number;
         bool boolean;
         void* object;
         void* array;
@@ -192,7 +220,7 @@ struct cj_entity {
         size_t index;
     };
     union {
-        float number;
+        struct cj_numeric number;
         bool boolean;
         char* string;
     };
@@ -203,7 +231,7 @@ struct cj_entity {
 /**
  * Return the numeric value of a json data type. Returns 0.0 for all types except cj_type_number.
  */
-double cj_entity_as_number(struct cj_entity* e);
+struct cj_numeric cj_entity_as_numeric(struct cj_entity* e);
 
 /**
  * Return the boolean value of a json data type. Returns false for all types except cj_type_bool.
@@ -283,12 +311,12 @@ struct cj_encoder {
 void cj_encoder_init(struct cj_encoder* encoder);
 
 /**
- * Tell the encoder to start a new object.
+ * Put a new object on the encoder stack.
  */
 void cj_encoder_begin_object(struct cj_encoder* encoder);
 
 /**
- * Tell the encoder to start a new array.
+ * Put a new array on the encoder stack.
  */
 void cj_encoder_begin_array(struct cj_encoder* encoder);
 
@@ -310,12 +338,21 @@ void cj_encoder_push_value(struct cj_encoder* encoder, const char* value);
 void cj_encoder_push_string(struct cj_encoder* encoder, const char* value);
 
 /**
- * Push a numeric value to the encoder. This function converts a float using %g with the default precision of 6 (%.6g),
+ * Push a numeric value to the encoder. This function converts ints using %d. Floats are converted using %g with the default precision of 6 (%.6g), if this is not what is needed the user is welcome to convert the float themself and pushing it to the encoder via cj_encoder_put_value.
+ */
+void cj_encoder_push_numeric(struct cj_encoder* encoder, struct cj_numeric value);
+
+/**
+ * Push a integer value to the encoder. This function converts ints using %d, if this is not what is needed the user is welcome to convert the float themself and pushing it to the encoder via cj_encoder_put_value.
+ */
+void cj_encoder_push_integer(struct cj_encoder* encoder, int value);
+
+/**
+ * Push a decimal value to the encoder. This function converts a float using %g with the default precision of 6 (%.6g),
  * if this is not what is needed the user is welcome to convert the float themself and pushing it to the encoder via
  * cj_encoder_put_value.
  */
-void cj_encoder_push_numeric(struct cj_encoder* encoder, float value);
-
+void cj_encoder_push_decimal(struct cj_encoder* encoder, float value);
 /**
  * Push a boolean value into the encoder.
  */
@@ -392,6 +429,15 @@ char* cj_span_dup(struct cj_span* s);
 
 struct cj_error cj_error_new(enum cj_error_code et, char* data, char* stopped_at);
 
+struct cj_numeric cj_numeric_integer(int v) {
+    struct cj_numeric r = {.type = cj_numeric_type_integer, .integer = v};
+    return r;
+}
+
+struct cj_numeric cj_numeric_decimal(float v) {
+    struct cj_numeric r = {.type = cj_numeric_type_decimal, .decimal = v};
+    return r;
+}
 enum cj_error_code cj_bytes_available(char** buffer, size_t num);
 
 enum cj_error_code cj_parse_object(struct cj_parser* parser, void* parent, unsigned int parent_type, char** b,
@@ -1138,6 +1184,7 @@ enum cj_error_code cj_parse_array(struct cj_parser* parser, void* this, unsigned
     CJ_ERROR_BUBBLE(cj_input_ready(cpp, 1))
 
 enum cj_error_code cj_parse_number(char** b, struct cj_value* value) {
+    bool is_decimal = false;
     char* start = *b;
 
     if (**b == '-') {
@@ -1160,6 +1207,7 @@ enum cj_error_code cj_parse_number(char** b, struct cj_value* value) {
     }
 
     if (**b == '.') {
+        is_decimal = true;
         *b += 1;
 
         if (**b >= '0' && **b <= '9') {
@@ -1174,6 +1222,7 @@ enum cj_error_code cj_parse_number(char** b, struct cj_value* value) {
     }
 
     if (**b == 'e' || **b == 'E') {
+        is_decimal = true;
         *b += 1;
 
         if (**b == '-') {
@@ -1199,7 +1248,12 @@ enum cj_error_code cj_parse_number(char** b, struct cj_value* value) {
     memcpy(number_str, start, len);
 
     value->type = cj_type_number;
-    value->number = atof(number_str);
+
+    if(is_decimal){
+        value->number = cj_numeric_decimal(atof(number_str));
+    } else {
+        value->number = cj_numeric_integer(atoi(number_str));
+    }
 
     return cj_error_none;
 }
@@ -1237,9 +1291,9 @@ enum cj_error_code cj_parse_null(char** b, struct cj_value* value) {
 
 // Decode
 
-double cj_entity_as_number(struct cj_entity* e) {
+struct cj_numeric cj_entity_as_number(struct cj_entity* e) {
     if (e == NULL || e->type != cj_type_number) {
-        return 0.;
+        return cj_numeric_integer(0);
     }
     return e->number;
 }
@@ -1743,10 +1797,25 @@ void cj_encoder_push_bool(struct cj_encoder* encoder, bool value) {
     cj_encoder_push_value(encoder, value ? CJ_ENCODER_CONST_TRUE : CJ_ENCODER_CONST_FALSE);
 }
 
-void cj_encoder_push_numeric(struct cj_encoder* encoder, float value) {
-    size_t len = snprintf(NULL, 0, "%g", value);
-    char* buffer = calloc(1, sizeof(char) * (len + 1));
-    snprintf(buffer, len + 1, "%g", value);
+void cj_encoder_push_integer(struct cj_encoder* encoder, int value) {
+    cj_encoder_push_numeric(encoder, cj_numeric_integer(value));
+}
+
+void cj_encoder_push_decimal(struct cj_encoder* encoder, float value) {
+    cj_encoder_push_numeric(encoder, cj_numeric_decimal(value));
+}
+
+void cj_encoder_push_numeric(struct cj_encoder* encoder, struct cj_numeric value) {
+    char* buffer;
+    if (value.type == cj_numeric_type_integer) {
+        size_t len = snprintf(NULL, 0, "%d", value.integer);
+        buffer = calloc(1, sizeof(char) * (len + 1));
+        snprintf(buffer, len + 1, "%d", value.integer);
+    } else {
+        size_t len = snprintf(NULL, 0, "%g", value.decimal);
+        buffer = calloc(1, sizeof(char) * (len + 1));
+        snprintf(buffer, len + 1, "%g", value.decimal);
+    }
     cj_encoder_push_value(encoder, buffer);
 }
 

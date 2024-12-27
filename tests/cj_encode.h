@@ -16,7 +16,7 @@ void test_cj_encode() {
     cj_encoder_push_id(&enc, "description");
     cj_encoder_push_string(&enc, "Me? Im just a fish!");
     cj_encoder_push_id(&enc, "pi");
-    cj_encoder_push_numeric(&enc, 3.141529f);
+    cj_encoder_push_numeric(&enc, cj_numeric_decimal(3.141529f));
     cj_encoder_end(&enc);
 
     char* result = cj_encoder_collapse(&enc);

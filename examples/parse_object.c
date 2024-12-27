@@ -90,7 +90,7 @@ enum cj_error_code set(void* this, unsigned int tag, struct cj_span* id, struct 
         case TAG_PROGRESS:
             struct progress* progress = (struct progress*)this;
             if (cj_span_eq(id, "linesWritten") && value->type == cj_type_number) {
-                progress->linesWritten = value->number;
+                progress->linesWritten = value->number.integer;
             }
             break;
     }
