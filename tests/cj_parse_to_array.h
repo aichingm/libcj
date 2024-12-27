@@ -9,7 +9,7 @@ struct person {
     double age;
 };
 
-enum cj_error_code pta_open(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+enum cj_error_code pta_open(enum cj_container_type type, void* parent, unsigned int parent_tag, union cj_key* key,
                             void** open, unsigned int* tag) {
     (void)type;
     switch (parent_tag) {

@@ -120,15 +120,12 @@ struct cj_numeric cj_numeric_integer(int v);
  */
 struct cj_numeric cj_numeric_decimal(float v);
 
-// TODO remoce outer struct. It is not needed.
 /**
- * A struct holding an uion of an index(size_t) or an id(cj_span). More context is need to know which it acually is.
+ * A union type holding an index(size_t) or an id(cj_span). More context is need to know which it acually is.
  */
-struct cj_key {
-    union {
-        size_t index;
-        struct cj_span id;
-    };
+union cj_key{
+    size_t index;
+    struct cj_span id;
 };
 
 /**
@@ -169,7 +166,7 @@ enum cj_container_type {
  * A struct holding three pointers to user defined functions used for allocating and linking parsed strucutes together.
  */
 struct cj_parser {
-    enum cj_error_code (*open)(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+    enum cj_error_code (*open)(enum cj_container_type type, void* parent, unsigned int parent_tag, union cj_key* key,
                                void** open, unsigned int* tag);
     enum cj_error_code (*push)(void* this, unsigned int tag, size_t index, struct cj_value* value);
     enum cj_error_code (*set)(void* this, unsigned int tag, struct cj_span* id, struct cj_value* value);
@@ -178,7 +175,7 @@ struct cj_parser {
 /**
  * Empty implementation for the open function of cj_parser.
  */
-enum cj_error_code cj_open_void(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+enum cj_error_code cj_open_void(enum cj_container_type type, void* parent, unsigned int parent_tag, union cj_key* key,
                                 void** open, unsigned int* tag);
 /**
  * Empty implementation for the push function of cj_parser.
@@ -653,7 +650,7 @@ bool cju_parse_unicode(char* str, unsigned int* value, size_t* hex_length) {
     return true;
 }
 
-enum cj_error_code cj_open_void(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+enum cj_error_code cj_open_void(enum cj_container_type type, void* parent, unsigned int parent_tag, union cj_key* key,
                                 void** open, unsigned int* tag) {
     (void)type;
     (void)parent;
@@ -1064,7 +1061,7 @@ enum cj_error_code cj_parse_object(struct cj_parser* parser, void* this, unsigne
 
     value->type = cj_type_object;
     value->object = this;
-    struct cj_key key;
+    union cj_key key;
 
     while (**b != '}') {
         CJ_ERROR_BUBBLE(cj_bytes_available(b, 1));
@@ -1134,7 +1131,7 @@ enum cj_error_code cj_parse_array(struct cj_parser* parser, void* this, unsigned
 
     value->type = cj_type_array;
     value->object = this;
-    struct cj_key key;
+    union cj_key key;
     key.index = 0;
 
     while (**b != ']') {
@@ -1377,7 +1374,7 @@ void cj_entity_free(struct cj_entity* e) {
     free(e);
 }
 
-enum cj_error_code cj_open_entry(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+enum cj_error_code cj_open_entry(enum cj_container_type type, void* parent, unsigned int parent_tag, union cj_key* key,
                                  void** open, unsigned int* tag) {
     (void)parent_tag;
     (void)tag;

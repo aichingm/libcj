@@ -39,7 +39,7 @@ struct project {
 
 // Setting up the parser callbacks (the parser will call back to you once data is parsed for you to store it some
 // where).
-enum cj_error_code open(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+enum cj_error_code open(enum cj_container_type type, void* parent, unsigned int parent_tag, union cj_key* key,
                         void** open, unsigned int* tag) {
     (void)type;
     switch (parent_tag) {

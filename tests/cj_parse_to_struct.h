@@ -32,7 +32,7 @@ enum cj_error_code pts_push(void* this, unsigned int tag, size_t index, struct c
     return cj_error_none;
 }
 
-enum cj_error_code pts_open(enum cj_container_type type, void* parent, unsigned int parent_tag, struct cj_key* key,
+enum cj_error_code pts_open(enum cj_container_type type, void* parent, unsigned int parent_tag, union cj_key* key,
                             void** open, unsigned int* tag) {
     (void)type;
     switch (parent_tag) {
