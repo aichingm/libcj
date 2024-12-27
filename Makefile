@@ -1,4 +1,4 @@
-.PHONY: default clean format test compile_commands.json
+.PHONY: default clean format test examples-and-tests compile_commands.json
 
 MAIN = bin/tests
 
@@ -29,21 +29,28 @@ format: $(SRCS) $(INCLS)
 clean:
 	rm -rf $(MAIN)
 	rm -rf $(OBJS)
+	rm -rf **/*.o
+	rm -rf bin
 
 test: default
 	./$(MAIN)
 
 bin/encoder: examples/encoder.c cj.h
-	gcc -std=gnu23 -pedantic -g -Wall -Wextra -I. -o bin/encoder examples/encoder.c
+	mkdir -p bin
+	$(CC) $(CFLAGS) $(INCLUDES) -o bin/encoder examples/encoder.c
 	bin/encoder | jq .
 
 bin/decode: examples/decode.c cj.h
-	gcc -std=gnu23 -pedantic -g -Wall -Wextra -I. -o bin/decode examples/decode.c
+	mkdir -p bin
+	$(CC) $(CFLAGS) $(INCLUDES) -o bin/decode examples/decode.c
 	bin/decode
 
 bin/parse_object: examples/parse_object.c cj.h
-	gcc -std=gnu23 -pedantic -g -Wall -Wextra -I. -o bin/parse_object examples/parse_object.c
+	mkdir -p bin
+	$(CC) $(CFLAGS) $(INCLUDES) -o bin/parse_object examples/parse_object.c
 	bin/parse_object
+
+examples-and-tests: bin/encoder bin/decode bin/parse_object test
 
 compile_commands.json:
 	make --always-make --dry-run | grep -wE 'gcc|g\+\+|c\+\+' | grep -w '\-c' | sed 's|cd.*.\&\&||g' | jq -nR '[inputs|{directory:"'`pwd`'", command:., file: (match(" [^ ]+$$").string[1:-1] + "c")}]' > compile_commands.json
